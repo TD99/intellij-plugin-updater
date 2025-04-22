@@ -76,6 +76,7 @@ public class PluginModifierUI extends JFrame {
 
     private void configureMenuBar() {
         JMenuBar menuBar = new JMenuBar();
+
         JMenu viewMenu = new JMenu("View");
 
         JMenuItem lightMode = new JMenuItem("Light Mode");
@@ -87,11 +88,15 @@ public class PluginModifierUI extends JFrame {
         viewMenu.add(lightMode);
         viewMenu.add(darkMode);
 
-        JMenuItem aboutMenu = new JMenuItem("About");
-        aboutMenu.addActionListener(e -> JOptionPane.showMessageDialog(this, "IntelliJ Plugin Version Modifier\nVersion 1.0\n\nCreated by Tim Dürr", "About", JOptionPane.INFORMATION_MESSAGE));
+        JMenuItem helpMenu = new JMenu("Help");
+
+        JMenuItem about = new JMenuItem("About");
+        about.addActionListener(e -> JOptionPane.showMessageDialog(this, "IntelliJ Plugin Version Modifier\nVersion 1.0\n\nCreated by Tim Dürr", "About", JOptionPane.INFORMATION_MESSAGE));
+
+        helpMenu.add(about);
 
         menuBar.add(viewMenu);
-        menuBar.add(aboutMenu);
+        menuBar.add(helpMenu);
 
         setJMenuBar(menuBar);
     }
