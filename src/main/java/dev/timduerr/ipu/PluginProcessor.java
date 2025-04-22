@@ -116,7 +116,7 @@ public class PluginProcessor {
             }
         }
         // Repack ZIP
-        File modifiedZip = new File(originalZip.getParentFile(), originalZip.getName().replace(".zip", "-modified.zip"));
+        File modifiedZip = new File(originalZip.getParentFile(), originalZip.getName().replace(".zip", "-" + newUntilBuild + ".zip"));
         try (ZipArchiveOutputStream zos = new ZipArchiveOutputStream(Files.newOutputStream(modifiedZip.toPath()))) {
             try (var paths = Files.walk(workDir)) {
                         paths.filter(p -> !Files.isDirectory(p))

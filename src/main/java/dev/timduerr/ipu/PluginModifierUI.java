@@ -7,10 +7,14 @@ import com.formdev.flatlaf.themes.FlatMacLightLaf;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.Font;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.File;
+import java.net.http.HttpClient;
 import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -97,21 +101,26 @@ public class PluginModifierUI extends JFrame {
         listModel = new DefaultListModel<>();
         jarList = new JList<>(listModel);
         jarList.setEnabled(false);
-        jarList.addListSelectionListener((ListSelectionEvent e) -> onJarSelected());
+        jarList.addListSelectionListener(e -> onJarSelected());
+
+        // Use our custom renderer to show a jar icon next to each entry
+        jarList.setCellRenderer(new JarListCellRenderer(32));
+
         JScrollPane listScroll = new JScrollPane(jarList);
         listScroll.setBorder(BorderFactory.createTitledBorder("Select JAR to Modify"));
         mainPanel.add(listScroll, BorderLayout.CENTER);
     }
 
+
     private void configureBottomBar() {
         JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         bottomPanel.add(new JLabel("New until-build:"));
-        versionSpinner = new JSpinner(new SpinnerNumberModel(243, 0, 999, 1));
+        versionSpinner = new JSpinner(new SpinnerNumberModel(getNewestBuildMajor(), 0, 999, 1));
         versionSpinner.setEnabled(false);
         ((JSpinner.DefaultEditor) versionSpinner.getEditor()).getTextField().setColumns(5);
         bottomPanel.add(versionSpinner);
 
-        modifyButton = new JButton("Modify & Download");
+        modifyButton = new JButton("Modify & Save");
         modifyButton.setEnabled(false);
         modifyButton.addActionListener(e -> modifyPlugin());
         bottomPanel.add(modifyButton);
@@ -187,6 +196,36 @@ public class PluginModifierUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Modified ZIP saved at:\n" + modified.getAbsolutePath());
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private int getNewestBuildMajor() {
+        String build = getNewestBuild();
+        int dotIndex = build.indexOf('.');
+        return dotIndex > 0 ? Integer.parseInt(build.substring(0, dotIndex)) : Integer.parseInt(build);
+    }
+
+    private String getNewestBuild() {
+        final String apiUrl = "https://data.services.jetbrains.com/products?code=IIU";
+
+        try {
+            String json = HttpClient
+                    .newHttpClient()
+                    .send(java.net.http.HttpRequest.newBuilder()
+                            .uri(java.net.URI.create(apiUrl))
+                            .build(), java.net.http.HttpResponse.BodyHandlers.ofString())
+                    .body();
+
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.readTree(json);
+            return root.get(0)
+                    .get("releases")
+                    .get(0)
+                    .get("build")
+                    .asText();
+        } catch (Exception e) {
+            logger.log(Level.WARNING, "Could not fetch latest build number: {}", e.getMessage());
+            return "";
         }
     }
 }
