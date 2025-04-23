@@ -1,7 +1,6 @@
 package dev.timduerr.ipu;
 
-import com.formdev.flatlaf.FlatDarkLaf;
-import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.*;
 import com.formdev.flatlaf.themes.FlatMacDarkLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 
@@ -19,6 +18,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static dev.timduerr.ipu.Theme.MAC_LIGHT;
 
 public class PluginModifierUI extends JFrame {
 
@@ -39,7 +40,7 @@ public class PluginModifierUI extends JFrame {
         initializeFont();
         initializeIcon();
 
-        switchToLight();
+        initializeTheme();
 
         configureWindow();
         configureMainPanel();
@@ -77,22 +78,36 @@ public class PluginModifierUI extends JFrame {
     private void configureMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
-        JMenu viewMenu = new JMenu("View");
+        JMenu viewMenu = new JMenu("Theme");
 
-        JMenuItem lightMode = new JMenuItem("Light Mode");
-        lightMode.addActionListener(e -> switchToLight());
+        JMenuItem macLight = new JMenuItem("Mac Light");
+        macLight.addActionListener(e -> switchToMacLight(true));
+        viewMenu.add(macLight);
 
-        JMenuItem darkMode = new JMenuItem("Dark Mode");
-        darkMode.addActionListener(e -> switchToDark());
+        JMenuItem macDark = new JMenuItem("Mac Dark");
+        macDark.addActionListener(e -> switchToMacDark(true));
+        viewMenu.add(macDark);
 
-        viewMenu.add(lightMode);
-        viewMenu.add(darkMode);
+        JMenuItem intelliJ = new JMenuItem("IntelliJ");
+        intelliJ.addActionListener(e -> switchToIntelliJ(true));
+        viewMenu.add(intelliJ);
+
+        JMenuItem darcula = new JMenuItem("Darcula");
+        darcula.addActionListener(e -> switchToDracula(true));
+        viewMenu.add(darcula);
+
+        JMenuItem classicLight = new JMenuItem("Classic Light");
+        classicLight.addActionListener(e -> switchToClassicLight(true));
+        viewMenu.add(classicLight);
+
+        JMenuItem classicDark = new JMenuItem("Classic Dark");
+        classicDark.addActionListener(e -> switchToClassicDark(true));
+        viewMenu.add(classicDark);
 
         JMenuItem helpMenu = new JMenu("Help");
 
         JMenuItem about = new JMenuItem("About");
         about.addActionListener(e -> JOptionPane.showMessageDialog(this, "IntelliJ Plugin Version Modifier\nVersion 1.0\n\nCreated by Tim Dürr", "About", JOptionPane.INFORMATION_MESSAGE));
-
         helpMenu.add(about);
 
         menuBar.add(viewMenu);
@@ -158,20 +173,45 @@ public class PluginModifierUI extends JFrame {
         }
     }
 
+    private void initializeTheme() {
+        String themeString = SettingsManager.getSetting("theme", "macLight");
+        Theme theme = Theme.fromName(themeString);
+
+        if (theme == null) {
+            theme = MAC_LIGHT;
+        }
+
+        switch (theme) {
+            case MAC_LIGHT -> switchToMacLight(false);
+            case MAC_DARK -> switchToMacDark(false);
+            case INTELLIJ -> switchToIntelliJ(false);
+            case DRACULA -> switchToDracula(false);
+            case CLASSIC_LIGHT -> switchToClassicLight(false);
+            case CLASSIC_DARK -> switchToClassicDark(false);
+        }
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Themes
+    private void switchToTheme(Theme theme, boolean update) {
+        switch (theme) {
+            case MAC_LIGHT -> FlatMacLightLaf.setup();
+            case MAC_DARK -> FlatMacDarkLaf.setup();
+            case INTELLIJ -> FlatIntelliJLaf.setup();
+            case DRACULA -> FlatDarculaLaf.setup();
+            case CLASSIC_LIGHT -> FlatLightLaf.setup();
+            case CLASSIC_DARK -> FlatDarkLaf.setup();
+        }
+
+        SwingUtilities.updateComponentTreeUI(this);
+
+        if (update) {
+            SettingsManager.setSetting("theme", theme.getName());
+        }
+    }
+
     // -----------------------------------------------------------------------------------------------------------------
     // Utility methods
-    private void switchToLight() {
-        FlatLightLaf.setup();
-        FlatMacLightLaf.setup();
-        SwingUtilities.updateComponentTreeUI(this);
-    }
-
-    private void switchToDark() {
-        FlatDarkLaf.setup();
-        FlatMacDarkLaf.setup();
-        SwingUtilities.updateComponentTreeUI(this);
-    }
-
     private void openZip() {
         JFileChooser chooser = new JFileChooser();
         chooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("ZIP Archives", "zip"));
