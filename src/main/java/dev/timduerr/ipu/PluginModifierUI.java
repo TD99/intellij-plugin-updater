@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import static dev.timduerr.ipu.Theme.MAC_LIGHT;
+import static dev.timduerr.ipu.Theme.*;
 
 public class PluginModifierUI extends JFrame {
 
@@ -81,27 +81,27 @@ public class PluginModifierUI extends JFrame {
         JMenu viewMenu = new JMenu("Theme");
 
         JMenuItem macLight = new JMenuItem("Mac Light");
-        macLight.addActionListener(e -> switchToMacLight(true));
+        macLight.addActionListener(e -> switchToTheme(MAC_LIGHT, true));
         viewMenu.add(macLight);
 
         JMenuItem macDark = new JMenuItem("Mac Dark");
-        macDark.addActionListener(e -> switchToMacDark(true));
+        macDark.addActionListener(e -> switchToTheme(MAC_DARK, true));
         viewMenu.add(macDark);
 
         JMenuItem intelliJ = new JMenuItem("IntelliJ");
-        intelliJ.addActionListener(e -> switchToIntelliJ(true));
+        intelliJ.addActionListener(e -> switchToTheme(INTELLIJ, true));
         viewMenu.add(intelliJ);
 
         JMenuItem darcula = new JMenuItem("Darcula");
-        darcula.addActionListener(e -> switchToDracula(true));
+        darcula.addActionListener(e -> switchToTheme(DRACULA, true));
         viewMenu.add(darcula);
 
         JMenuItem classicLight = new JMenuItem("Classic Light");
-        classicLight.addActionListener(e -> switchToClassicLight(true));
+        classicLight.addActionListener(e -> switchToTheme(CLASSIC_LIGHT, true));
         viewMenu.add(classicLight);
 
         JMenuItem classicDark = new JMenuItem("Classic Dark");
-        classicDark.addActionListener(e -> switchToClassicDark(true));
+        classicDark.addActionListener(e -> switchToTheme(CLASSIC_DARK, true));
         viewMenu.add(classicDark);
 
         JMenuItem helpMenu = new JMenu("Help");
@@ -181,14 +181,7 @@ public class PluginModifierUI extends JFrame {
             theme = MAC_LIGHT;
         }
 
-        switch (theme) {
-            case MAC_LIGHT -> switchToMacLight(false);
-            case MAC_DARK -> switchToMacDark(false);
-            case INTELLIJ -> switchToIntelliJ(false);
-            case DRACULA -> switchToDracula(false);
-            case CLASSIC_LIGHT -> switchToClassicLight(false);
-            case CLASSIC_DARK -> switchToClassicDark(false);
-        }
+        switchToTheme(theme, false);
     }
 
     // -----------------------------------------------------------------------------------------------------------------
