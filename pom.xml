@@ -15,7 +15,7 @@
         <maven.compiler.target>21</maven.compiler.target>
         <!-- Ensure FlatLaf resources are included -->
         <flatlaf.version>3.5</flatlaf.version>
-        <compress.version>1.23.0</compress.version>
+        <compress.version>1.26.0</compress.version>
         <jdom2.version>2.0.6</jdom2.version>
     </properties>
 
